@@ -1,23 +1,33 @@
-const { Pool } = require('pg');
+// db.js
+const mysql = require('mysql2/promise');
 require('dotenv').config();
 
-const pool = new Pool({
- user: process.env.DB_USER,
- host: process.env.DB_HOST,
- database: process.env.DB_DATABASE,
- password: process.env.DB_PASSWORD,
- port: process.env.DB_PORT,
+const pool = mysql.createPool({
+  host: process.env.DB_HOST,
+  port: Number(process.env.DB_PORT || 3306),
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_DATABASE,
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
 });
 
-// Verifica la conexión al iniciar
-pool.connect((err, client, release) => {
- if (err) {
- return console.error('Error adquiriendo cliente', err.stack);
- }
- console.log('Conexión a PostgreSQL establecida exitosamente.');
- client.release();
-});
+(async () => {
+  try {
+    const conn = await pool.getConnection();
+    console.log('Conexión a MySQL establecida exitosamente.');
+    conn.release();
+  } catch (err) {
+    console.error('Error conectando a MySQL:', err.message);
+  }
+})();
 
 module.exports = {
- query: (text, params) => pool.query(text, params),
+  // Mantener interfaz similar a pg: retorna { rows }
+  query: async (sql, params) => {
+    const [rows] = await pool.execute(sql, params);
+    return { rows };
+  },
+  pool,
 };

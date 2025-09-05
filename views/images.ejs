@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Imágenes de <%= product.name %></title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Imágenes: <%= product.name %> <span class="small">(#<%= product.id %>)</span></h1>
+
+    <div class="card" style="margin: 10px 0;">
+      <div>
+        <h3>Agregar nueva imagen</h3>
+        <div class="small">Se guardará ligada a este producto</div>
+      </div>
+      <form id="img-form" style="display:flex; gap:8px; align-items:center;">
+        <input required type="url" id="url" placeholder="https://..." style="width:360px; padding:8px;">
+        <input type="text" id="alt" placeholder="Texto alternativo" style="width:220px; padding:8px;">
+        <button class="btn" type="submit">Guardar</button>
+        <a class="btn secondary" href="/products-view">Volver</a>
+      </form>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>URL</th>
+          <th>Alt</th>
+          <th>Creado</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (images && images.length) { %>
+          <% images.forEach(img => { %>
+            <tr>
+              <td><%= img.id %></td>
+              <td style="text-align:left"><a href="<%= img.url %>" target="_blank"><%= img.url %></a></td>
+              <td><%= img.alt_text || '' %></td>
+              <td><%= new Date(img.created_at).toLocaleString() %></td>
+            </tr>
+          <% }) %>
+        <% } else { %>
+          <tr><td colspan="4">Sin imágenes aún</td></tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    const form = document.getElementById('img-form');
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = form.querySelector('button[type="submit"]');
+      btn.disabled = true;
+
+      const payload = {
+        url: document.getElementById('url').value.trim(),
+        alt_text: document.getElementById('alt').value.trim() || null
+      };
+
+      try {
+        const res = await fetch('/api/products/<%= product.id %>/images', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (!res.ok) throw new Error('No se pudo guardar la imagen');
+        location.reload();
+      } catch (err) {
+        alert(err.message);
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

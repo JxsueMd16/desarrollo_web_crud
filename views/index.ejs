@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Lista de Productos</title>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>Lista de Productos</h1>
+
+    <!-- Tarjetas de totales -->
+    <div class="cards">
+      <div class="card">
+        <div>
+          <h3>Total de productos</h3>
+          <div class="value" id="totalProducts"><%= (stats && stats.total) != null ? stats.total : 0 %></div>
+        </div>
+        <div class="actions">
+        </div>
+      </div>
+
+      <div class="card">
+        <div>
+          <h3>Sumatoria de precios</h3>
+          <div class="value" id="sumPrices">
+            Q <%= (stats && stats.total_price) != null ? Number(stats.total_price).toFixed(2) : '0.00' %>
+          </div>
+        </div>
+        <div class="actions">
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabla -->
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nombre</th>
+          <th>Descripción</th>
+          <th>Precio</th>
+          <th>Creado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (products && products.length > 0) { %>
+          <% products.forEach(p => { %>
+            <tr>
+              <td><%= p.id %></td>
+              <td><%= p.name %></td>
+              <td><%= p.description %></td>
+              <td>Q <%= Number(p.price).toFixed(2) %></td>
+              <td><%= new Date(p.created_at).toLocaleString() %></td>
+              <td>
+                <a class="btn" href="/products/<%= p.id %>/images-view">Imágenes</a>
+              </td>
+            </tr>
+          <% }) %>
+        <% } else { %>
+          <tr>
+            <td colspan="6">No hay productos disponibles</td>
+          </tr>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</body>
+</html>
