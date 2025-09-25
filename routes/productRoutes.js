@@ -1,17 +1,20 @@
+// routes/productRoutes.js
 const express = require('express');
 const router = express.Router();
 const c = require('../controllers/productController');
-
-// CRUD
-router.post('/products', c.createProduct);
-router.get('/products', c.getProducts);
-router.get('/products/:id', c.getProductById);
-router.put('/products/:id', c.updateProduct);
-router.delete('/products/:id', c.deleteProduct);
+const { protect } = require('../middleware/authMiddleware');
 
 router.get('/products/count', c.countProducts);
 router.get('/products/sum', c.sumProducts);
-router.post('/products/:id/images', c.createImage);
+
+// CRUD
+router.post('/products', protect, c.createProduct); 
+router.get('/products', c.getProducts); 
+router.post('/products/:id/images', protect, c.createImage); 
 router.get('/products/:id/images', c.getImagesByProduct);
+
+router.get('/products/:id', c.getProductById);
+router.put('/products/:id', protect, c.updateProduct);
+router.delete('/products/:id', protect, c.deleteProduct);
 
 module.exports = router;
